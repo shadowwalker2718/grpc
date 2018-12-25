@@ -1,6 +1,10 @@
 [gRPC - An RPC library and framework](http://github.com/grpc/grpc)
 ===================================
 
+`git submodule update --init --recursive`
+
+
+
 [![Join the chat at https://gitter.im/grpc/grpc](https://badges.gitter.im/grpc/grpc.svg)](https://gitter.im/grpc/grpc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Copyright 2015
