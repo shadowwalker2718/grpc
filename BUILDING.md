@@ -89,6 +89,19 @@ repository at the latest stable version.
  $ git submodule update --init
  ```
 
+
+Actually I built a bunch of plugins:
+```
+18:27 $ ll /usr/local/bin/grpc_*
+-rwxr-xr-x 1 root root 18406080 Dec 25 18:11 /usr/local/bin/grpc_cpp_plugin*
+-rwxr-xr-x 1 root root 19503856 Dec 25 18:11 /usr/local/bin/grpc_csharp_plugin*
+-rwxr-xr-x 1 root root 17361760 Dec 25 18:11 /usr/local/bin/grpc_node_plugin*
+-rwxr-xr-x 1 root root 18630248 Dec 25 18:11 /usr/local/bin/grpc_objective_c_plugin*
+-rwxr-xr-x 1 root root 18010144 Dec 25 18:11 /usr/local/bin/grpc_php_plugin*
+-rwxr-xr-x 1 root root 17783776 Dec 25 18:11 /usr/local/bin/grpc_python_plugin*
+-rwxr-xr-x 1 root root 17195824 Dec 25 18:11 /usr/local/bin/grpc_ruby_plugin*
+```
+
 ## Windows
 
 ```
