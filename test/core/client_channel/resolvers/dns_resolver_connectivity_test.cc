@@ -21,10 +21,10 @@
 #include <grpc/grpc.h>
 #include <grpc/support/alloc.h>
 
-#include "src/core/ext/filters/client_channel/lb_policy_factory.h"
 #include "src/core/ext/filters/client_channel/resolver.h"
 #include "src/core/ext/filters/client_channel/resolver/dns/c_ares/grpc_ares_wrapper.h"
 #include "src/core/ext/filters/client_channel/resolver_registry.h"
+#include "src/core/ext/filters/client_channel/server_address.h"
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/iomgr/combiner.h"
 #include "src/core/lib/iomgr/resolve_address.h"
@@ -60,11 +60,12 @@ static void my_resolve_address(const char* addr, const char* default_port,
 static grpc_address_resolver_vtable test_resolver = {my_resolve_address,
                                                      nullptr};
 
-static grpc_ares_request* my_dns_lookup_ares(
+static grpc_ares_request* my_dns_lookup_ares_locked(
     const char* dns_server, const char* addr, const char* default_port,
     grpc_pollset_set* interested_parties, grpc_closure* on_done,
-    grpc_lb_addresses** lb_addrs, bool check_grpclb,
-    char** service_config_json) {
+    grpc_core::UniquePtr<grpc_core::ServerAddressList>* addresses,
+    bool check_grpclb, char** service_config_json, int query_timeout_ms,
+    grpc_combiner* combiner) {
   gpr_mu_lock(&g_mu);
   GPR_ASSERT(0 == strcmp("test", addr));
   grpc_error* error = GRPC_ERROR_NONE;
@@ -74,12 +75,18 @@ static grpc_ares_request* my_dns_lookup_ares(
     error = GRPC_ERROR_CREATE_FROM_STATIC_STRING("Forced Failure");
   } else {
     gpr_mu_unlock(&g_mu);
-    *lb_addrs = grpc_lb_addresses_create(1, nullptr);
-    grpc_lb_addresses_set_address(*lb_addrs, 0, nullptr, 0, false, nullptr,
-                                  nullptr);
+    *addresses = grpc_core::MakeUnique<grpc_core::ServerAddressList>();
+    grpc_resolved_address dummy_resolved_address;
+    memset(&dummy_resolved_address, 0, sizeof(dummy_resolved_address));
+    dummy_resolved_address.len = 123;
+    (*addresses)->emplace_back(dummy_resolved_address, nullptr);
   }
   GRPC_CLOSURE_SCHED(on_done, error);
   return nullptr;
+}
+
+static void my_cancel_ares_request_locked(grpc_ares_request* request) {
+  GPR_ASSERT(request == nullptr);
 }
 
 static grpc_core::OrphanablePtr<grpc_core::Resolver> create_resolver(
@@ -141,13 +148,14 @@ static void call_resolver_next_after_locking(grpc_core::Resolver* resolver,
 }
 
 int main(int argc, char** argv) {
-  grpc_test_init(argc, argv);
+  grpc::testing::TestEnvironment env(argc, argv);
 
   grpc_init();
   gpr_mu_init(&g_mu);
   g_combiner = grpc_combiner_create();
   grpc_set_resolver_impl(&test_resolver);
-  grpc_dns_lookup_ares = my_dns_lookup_ares;
+  grpc_dns_lookup_ares_locked = my_dns_lookup_ares_locked;
+  grpc_cancel_ares_request_locked = my_cancel_ares_request_locked;
   grpc_channel_args* result = (grpc_channel_args*)1;
 
   {

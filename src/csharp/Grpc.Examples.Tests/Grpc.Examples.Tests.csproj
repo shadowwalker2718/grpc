@@ -4,7 +4,7 @@
   <Import Project="..\Grpc.Core\Common.csproj.include" />
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netcoreapp1.0</TargetFrameworks>
+    <TargetFrameworks>net45;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>Grpc.Examples.Tests</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>Grpc.Examples.Tests</PackageId>
@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.6.0" />
-    <PackageReference Include="NUnitLite" Version="3.6.0" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnitLite" Version="3.10.1" />
     <PackageReference Include="Moq" Version="4.8.2" />
   </ItemGroup>
 

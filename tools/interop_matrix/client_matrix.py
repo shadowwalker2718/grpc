@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Dictionaries used for client matrix testing.
+# Defines languages, runtimes and releases for backward compatibility testing
 
 
 def get_github_repo(lang):
@@ -53,8 +53,7 @@ LANG_RUNTIME_MATRIX = {
     'csharp': ['csharp', 'csharpcoreclr'],
 }
 
-# Dictionary of releases per language.  For each language, we need to provide
-# a release tag pointing to the latest build of the branch.
+# Dictionary of known releases for given language.
 LANG_RELEASE_MATRIX = {
     'cxx': [
         {
@@ -93,6 +92,21 @@ LANG_RELEASE_MATRIX = {
         {
             'v1.12.0': None
         },
+        {
+            'v1.13.0': None
+        },
+        {
+            'v1.14.1': None
+        },
+        {
+            'v1.15.0': None
+        },
+        {
+            'v1.16.0': None
+        },
+        {
+            'v1.17.1': None
+        },
     ],
     'go': [
         {
@@ -129,7 +143,19 @@ LANG_RELEASE_MATRIX = {
             'v1.11.3': None
         },
         {
-            'v1.12.0': None
+            'v1.12.2': None
+        },
+        {
+            'v1.13.0': None
+        },
+        {
+            'v1.14.0': None
+        },
+        {
+            'v1.15.0': None
+        },
+        {
+            'v1.16.0': None
         },
     ],
     'java': [
@@ -172,6 +198,21 @@ LANG_RELEASE_MATRIX = {
         {
             'v1.12.0': None
         },
+        {
+            'v1.13.1': None
+        },
+        {
+            'v1.14.0': None
+        },
+        {
+            'v1.15.0': None
+        },
+        {
+            'v1.16.1': None
+        },
+        {
+            'v1.17.1': None
+        },
     ],
     'python': [
         {
@@ -210,6 +251,21 @@ LANG_RELEASE_MATRIX = {
         {
             'v1.12.0': None
         },
+        {
+            'v1.13.0': None
+        },
+        {
+            'v1.14.1': None
+        },
+        {
+            'v1.15.0': None
+        },
+        {
+            'v1.16.0': None
+        },
+        {
+            'v1.17.1': None
+        },
     ],
     'node': [
         {
@@ -242,6 +298,12 @@ LANG_RELEASE_MATRIX = {
         },
         {
             'v1.10.0': None
+        },
+        {
+            'v1.11.3': None
+        },
+        {
+            'v1.12.4': None
         },
     ],
     'ruby': [
@@ -286,6 +348,21 @@ LANG_RELEASE_MATRIX = {
         {
             'v1.12.0': None
         },
+        {
+            'v1.13.0': None
+        },
+        {
+            'v1.14.1': None
+        },
+        {
+            'v1.15.0': None
+        },
+        {
+            'v1.16.0': None
+        },
+        {
+            'v1.17.1': None
+        },
     ],
     'php': [
         {
@@ -323,6 +400,21 @@ LANG_RELEASE_MATRIX = {
         },
         {
             'v1.12.0': None
+        },
+        {
+            'v1.13.0': None
+        },
+        {
+            'v1.14.1': None
+        },
+        {
+            'v1.15.0': None
+        },
+        {
+            'v1.16.0': None
+        },
+        {
+            'v1.17.1': None
         },
     ],
     'csharp': [
@@ -366,6 +458,21 @@ LANG_RELEASE_MATRIX = {
         },
         {
             'v1.12.0': None
+        },
+        {
+            'v1.13.0': None
+        },
+        {
+            'v1.14.1': None
+        },
+        {
+            'v1.15.0': None
+        },
+        {
+            'v1.16.0': None
+        },
+        {
+            'v1.17.1': None
         },
     ],
 }

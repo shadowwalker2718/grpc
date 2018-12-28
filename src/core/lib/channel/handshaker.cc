@@ -223,18 +223,23 @@ static bool call_next_handshaker_locked(grpc_handshake_manager* mgr,
       mgr->index == mgr->count) {
     if (error == GRPC_ERROR_NONE && mgr->shutdown) {
       error = GRPC_ERROR_CREATE_FROM_STATIC_STRING("handshaker shutdown");
-      // TODO(roth): It is currently necessary to shutdown endpoints
-      // before destroying then, even when we know that there are no
-      // pending read/write callbacks.  This should be fixed, at which
-      // point this can be removed.
-      grpc_endpoint_shutdown(mgr->args.endpoint, GRPC_ERROR_REF(error));
-      grpc_endpoint_destroy(mgr->args.endpoint);
-      mgr->args.endpoint = nullptr;
-      grpc_channel_args_destroy(mgr->args.args);
-      mgr->args.args = nullptr;
-      grpc_slice_buffer_destroy_internal(mgr->args.read_buffer);
-      gpr_free(mgr->args.read_buffer);
-      mgr->args.read_buffer = nullptr;
+      // It is possible that the endpoint has already been destroyed by
+      // a shutdown call while this callback was sitting on the ExecCtx
+      // with no error.
+      if (mgr->args.endpoint != nullptr) {
+        // TODO(roth): It is currently necessary to shutdown endpoints
+        // before destroying then, even when we know that there are no
+        // pending read/write callbacks.  This should be fixed, at which
+        // point this can be removed.
+        grpc_endpoint_shutdown(mgr->args.endpoint, GRPC_ERROR_REF(error));
+        grpc_endpoint_destroy(mgr->args.endpoint);
+        mgr->args.endpoint = nullptr;
+        grpc_channel_args_destroy(mgr->args.args);
+        mgr->args.args = nullptr;
+        grpc_slice_buffer_destroy_internal(mgr->args.read_buffer);
+        gpr_free(mgr->args.read_buffer);
+        mgr->args.read_buffer = nullptr;
+      }
     }
     if (grpc_handshaker_trace.enabled()) {
       gpr_log(GPR_INFO,
@@ -287,17 +292,18 @@ static void on_timeout(void* arg, grpc_error* error) {
   grpc_handshake_manager_unref(mgr);
 }
 
-void grpc_handshake_manager_do_handshake(
-    grpc_handshake_manager* mgr, grpc_pollset_set* interested_parties,
-    grpc_endpoint* endpoint, const grpc_channel_args* channel_args,
-    grpc_millis deadline, grpc_tcp_server_acceptor* acceptor,
-    grpc_iomgr_cb_func on_handshake_done, void* user_data) {
+void grpc_handshake_manager_do_handshake(grpc_handshake_manager* mgr,
+                                         grpc_endpoint* endpoint,
+                                         const grpc_channel_args* channel_args,
+                                         grpc_millis deadline,
+                                         grpc_tcp_server_acceptor* acceptor,
+                                         grpc_iomgr_cb_func on_handshake_done,
+                                         void* user_data) {
   gpr_mu_lock(&mgr->mu);
   GPR_ASSERT(mgr->index == 0);
   GPR_ASSERT(!mgr->shutdown);
   // Construct handshaker args.  These will be passed through all
   // handshakers and eventually be freed by the on_handshake_done callback.
-  mgr->args.interested_parties = interested_parties;
   mgr->args.endpoint = endpoint;
   mgr->args.args = grpc_channel_args_copy(channel_args);
   mgr->args.user_data = user_data;

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 cimport libc.time
+from libc.stdint cimport intptr_t
 
 
 # Typedef types with approximately the same semantics to provide their names to
@@ -121,7 +122,6 @@ cdef extern from "grpc/grpc.h":
     GRPC_STATUS_DATA_LOSS
     GRPC_STATUS__DO_NOT_USE
 
-  const char *GRPC_ARG_PRIMARY_USER_AGENT_STRING
   const char *GRPC_ARG_ENABLE_CENSUS
   const char *GRPC_ARG_MAX_CONCURRENT_STREAMS
   const char *GRPC_ARG_MAX_RECEIVE_MESSAGE_LENGTH
@@ -139,6 +139,10 @@ cdef extern from "grpc/grpc.h":
   const int GRPC_WRITE_BUFFER_HINT
   const int GRPC_WRITE_NO_COMPRESS
   const int GRPC_WRITE_USED_MASK
+
+  const int GRPC_INITIAL_METADATA_WAIT_FOR_READY
+  const int GRPC_INITIAL_METADATA_WAIT_FOR_READY_EXPLICITLY_SET
+  const int GRPC_INITIAL_METADATA_USED_MASK
 
   const int GRPC_MAX_COMPLETION_QUEUE_PLUCKERS
 
@@ -185,12 +189,6 @@ cdef extern from "grpc/grpc.h":
   ctypedef struct grpc_channel_args:
     size_t arguments_length "num_args"
     grpc_arg *arguments "args"
-
-  ctypedef enum grpc_compression_level:
-    GRPC_COMPRESS_LEVEL_NONE
-    GRPC_COMPRESS_LEVEL_LOW
-    GRPC_COMPRESS_LEVEL_MED
-    GRPC_COMPRESS_LEVEL_HIGH
 
   ctypedef enum grpc_stream_compression_level:
     GRPC_STREAM_COMPRESS_LEVEL_NONE
@@ -322,6 +320,7 @@ cdef extern from "grpc/grpc.h":
 
   void grpc_init() nogil
   void grpc_shutdown() nogil
+  int grpc_is_initialized() nogil
 
   ctypedef struct grpc_completion_queue_factory:
     pass
@@ -385,6 +384,16 @@ cdef extern from "grpc/grpc.h":
       grpc_server *server, grpc_completion_queue *cq, void *tag) nogil
   void grpc_server_cancel_all_calls(grpc_server *server) nogil
   void grpc_server_destroy(grpc_server *server) nogil
+
+  char* grpc_channelz_get_top_channels(intptr_t start_channel_id)
+  char* grpc_channelz_get_servers(intptr_t start_server_id)
+  char* grpc_channelz_get_server(intptr_t server_id)
+  char* grpc_channelz_get_server_sockets(intptr_t server_id,
+                                         intptr_t start_socket_id,
+                                         intptr_t max_results)
+  char* grpc_channelz_get_channel(intptr_t channel_id)
+  char* grpc_channelz_get_subchannel(intptr_t subchannel_id)
+  char* grpc_channelz_get_socket(intptr_t socket_id)
 
 
 cdef extern from "grpc/grpc_security.h":
@@ -453,8 +462,11 @@ cdef extern from "grpc/grpc_security.h":
     # We don't care about the internals (and in fact don't know them)
     pass
 
-
   ctypedef struct grpc_ssl_session_cache:
+    # We don't care about the internals (and in fact don't know them)
+    pass
+
+  ctypedef struct verify_peer_options:
     # We don't care about the internals (and in fact don't know them)
     pass
 
@@ -469,7 +481,7 @@ cdef extern from "grpc/grpc_security.h":
   grpc_channel_credentials *grpc_google_default_credentials_create() nogil
   grpc_channel_credentials *grpc_ssl_credentials_create(
       const char *pem_root_certs, grpc_ssl_pem_key_cert_pair *pem_key_cert_pair,
-      void *reserved) nogil
+      verify_peer_options *verify_options, void *reserved) nogil
   grpc_channel_credentials *grpc_composite_channel_credentials_create(
       grpc_channel_credentials *creds1, grpc_call_credentials *creds2,
       void *reserved) nogil

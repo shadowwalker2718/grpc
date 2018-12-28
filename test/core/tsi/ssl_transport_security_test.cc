@@ -208,9 +208,11 @@ static void check_session_reusage(ssl_tsi_test_fixture* ssl_fixture,
       tsi_peer_get_property_by_name(peer, TSI_SSL_SESSION_REUSED_PEER_PROPERTY);
   GPR_ASSERT(session_reused != nullptr);
   if (ssl_fixture->session_reused) {
-    GPR_ASSERT(strcmp(session_reused->value.data, "true") == 0);
+    GPR_ASSERT(strncmp(session_reused->value.data, "true",
+                       session_reused->value.length) == 0);
   } else {
-    GPR_ASSERT(strcmp(session_reused->value.data, "false") == 0);
+    GPR_ASSERT(strncmp(session_reused->value.data, "false",
+                       session_reused->value.length) == 0);
   }
 }
 
@@ -775,7 +777,7 @@ void ssl_tsi_test_handshaker_factory_internals() {
 }
 
 int main(int argc, char** argv) {
-  grpc_test_init(argc, argv);
+  grpc::testing::TestEnvironment env(argc, argv);
   grpc_init();
 
   ssl_tsi_test_do_handshake_tiny_handshake_buffer();
