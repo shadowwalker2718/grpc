@@ -16,8 +16,6 @@ gRPC is a modern, open source, high-performance remote procedure call (RPC) fram
 
 `git submodule update --init --recursive`
 
-
-
 [![Join the chat at https://gitter.im/grpc/grpc](https://badges.gitter.im/grpc/grpc.svg)](https://gitter.im/grpc/grpc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # To start using gRPC
