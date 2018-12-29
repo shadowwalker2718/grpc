@@ -112,6 +112,8 @@ class ByteBuffer final {
   /// Dump (read) the buffer contents into \a slices.
   Status Dump(std::vector<Slice>* slices) const;
 
+  Status Dump(Slice* slice) const;
+
   /// Remove all data.
   void Clear() {
     if (buffer_) {
@@ -149,6 +151,8 @@ class ByteBuffer final {
 
   /// Is this ByteBuffer valid?
   bool Valid() const { return (buffer_ != nullptr); }
+
+  grpc_byte_buffer* get_buffer() { return buffer_; }
 
  private:
   friend class SerializationTraits<ByteBuffer, void>;
